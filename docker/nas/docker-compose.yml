@@ -1,0 +1,23 @@
+services:
+  samba:
+    image: dperson/samba
+    container_name: samba
+    restart: always
+    command: "-u 'user;password' -s 'public;/data;yes;no'"
+    ports:
+      - "137:137/udp"
+      - "138:138/udp"
+      - "139:139"
+      - "445:445"
+    volumes:
+      - ${STORAGE_BASE}/nas:/data
+
+  filebrowser:
+    image: filebrowser/filebrowser
+    container_name: filebrowser
+    ports:
+      - "8080:80"
+    volumes:
+      - ${STORAGE_BASE}/nas:/srv
+      # - ./volumes/nas:/srv
+    restart: always
