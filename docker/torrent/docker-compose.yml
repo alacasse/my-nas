@@ -1,0 +1,23 @@
+services:
+  torrent:
+    image: ghcr.io/linuxserver/qbittorrent
+    networks:
+      vpn_net:
+        ipv4_address: 172.18.0.10
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - WEBUI_PORT=8080
+    # volumes:
+    #   - ./downloads:/downloads
+    #   - ./config:/config
+    command: >
+      bash -c "
+        ip route del default &&
+        ip route add default via 172.18.0.2 &&
+        /init"
+    restart: unless-stopped
+
+networks:
+  vpn_net:
+    external: true
