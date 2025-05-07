@@ -1,21 +1,24 @@
 services:
   torrent:
     image: ghcr.io/linuxserver/qbittorrent
+    container_name: torrent
     networks:
-      vpn_net:
-        ipv4_address: 172.18.0.10
+      - vpn_net
+    # ports:
+    # - "8080:8080"
+    dns:
+      - 192.168.50.124
+    # - 1.1.1.1
+    # - 8.8.8.8
+    cap_add:
+      - NET_ADMIN
     environment:
       - PUID=1000
       - PGID=1000
       - WEBUI_PORT=8080
-    # volumes:
-    #   - ./downloads:/downloads
-    #   - ./config:/config
-    command: >
-      bash -c "
-        ip route del default &&
-        ip route add default via 172.18.0.2 &&
-        /init"
+    volumes:
+      # - ./vpn-entrypoint.sh:/vpn-entrypoint.sh:ro
+      - ./change-route.sh:/etc/cont-init.d/change-route.sh:ro
     restart: unless-stopped
 
 networks:

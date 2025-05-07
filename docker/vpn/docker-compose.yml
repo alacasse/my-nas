@@ -1,29 +1,75 @@
 services:
   vpn:
-    image: ghcr.io/bubuntux/nordvpn
+    image: qmcgaw/gluetun
+    build: . # Optional, if you want to build from Dockerfile and install debug tools
+    container_name: vpn
+    networks:
+      - vpn_net
     cap_add:
-      - NET_ADMIN               # Required
-      - NET_RAW                 # Required
+      - NET_ADMIN
     devices:
       - /dev/net/tun
-    environment:                # Review https://github.com/bubuntux/nordvpn#environment-variables
-      - TOKEN=e9f2abfaaf4ab61f72d2f8730f63d4993ac7910064a3c398f0e069308d294260
-      - CONNECT=Canada
-      - TECHNOLOGY=NordLynx
-      - NETWORK=192.168.50.0/24  # So it can be accessed within the local network
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=1  # Recomended if using ipv4 only
-    networks:
-      vpn_net:
-        ipv4_address: 172.18.0.2
+    environment:
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_TYPE=wireguard
+      - SERVER_COUNTRIES=Canada
+      - WIREGUARD_PRIVATE_KEY=T63rVgp6c6etMbVOFXtRvIn04ThODRhyrgMXtl1pBC8=
+      - WIREGUARD_ADDRESSES=10.5.0.2/32
+      - FIREWALL=on
+      - DOT=on
+    volumes:
+      - ./gluetun:/gluetun
+      - ./vpn-entrypoint.sh:/vpn-entrypoint.sh:ro
+    entrypoint: ["/vpn-entrypoint.sh"]
+    ports:
+      - 8080:8080  # Only if you're exposing something
     restart: unless-stopped
 
 networks:
   vpn_net:
     external: true
+
+# networks:
+#   vpn_net:
+#     driver: bridge
+#     ipam:
+#       config:
+#         - subnet: 172.19.0.0/24
+#           gateway: 172.19.0.1
+
+# root@4b8a0b6392f2:/# sudo wg show nordlynx private-key
+# SK3rVgp6c6etMbVOFXtRvIn04ThODRhyrgMXtl1pBG8=
+
+# root@4b8a0b6392f2:/# sudo wg show nordlynx public-key
+# nIOcf9MF7tDXDRbmFRh99adLsIe9j1cFzRAuc42BpmU=
+
+
+# services:
+#   vpn:
+#     image: ghcr.io/bubuntux/nordvpn
+#     cap_add:
+#       - NET_ADMIN               # Required
+#       - NET_RAW                 # Required
+#     devices:
+#       - /dev/net/tun
+#     environment:                # Review https://github.com/bubuntux/nordvpn#environment-variables
+#       - TOKEN=  
+#       - CONNECT=Canada
+#       - TECHNOLOGY=NordLynx
+#       - NETWORK=192.168.50.0/24  # So it can be accessed within the local network
+#     dns:
+#       - 8.8.8.8
+#       - 1.1.1.1
+#     sysctls:
+#       - net.ipv6.conf.all.disable_ipv6=1  # Recomended if using ipv4 only
+#     networks:
+#       vpn_net:
+#         ipv4_address: 172.18.0.2
+#     restart: unless-stopped
+
+# networks:
+#   vpn_net:
+#     external: true
 
 
 # services:
