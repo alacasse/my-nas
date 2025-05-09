@@ -4,7 +4,8 @@ services:
     build: . # Optional, if you want to build from Dockerfile and install debug tools
     container_name: vpn
     networks:
-      - vpn_net
+      vpn_net:
+        ipv4_address: 172.18.0.2
     cap_add:
       - NET_ADMIN
     devices:

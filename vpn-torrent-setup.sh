@@ -15,7 +15,7 @@ fi
 
 # Start VPN container
 echo "Starting VPN container..."
-docker compose -f ./docker/vpn/docker-compose.yml up -d --build
+docker compose --env-file ./docker/.env.dev -f ./docker/vpn/docker-compose.yml up -d --build
 
 # Wait for VPN container to be up
 echo "Waiting 5 seconds for VPN container to stabilize..."
@@ -23,6 +23,6 @@ sleep 5
 
 # Start torrent container
 echo "Starting Torrent container..."
-docker compose -f ./docker/torrent/docker-compose.yml up -d --build
+docker compose --env-file ./docker/.env.dev -f ./docker/torrent/docker-compose.yml up -d --build
 
 echo "All services started. Torrent container is routed through VPN."
