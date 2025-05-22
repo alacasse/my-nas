@@ -5,6 +5,7 @@ services:
     networks:
       vpn_net:
         ipv4_address: 172.18.0.10
+      lan_net: {}
     dns:
       - 192.168.50.124
       # - 1.1.1.1
@@ -25,4 +26,6 @@ services:
 
 networks:
   vpn_net:
+    external: true
+  lan_net:
     external: true

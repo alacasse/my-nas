@@ -8,16 +8,23 @@ services:
       - "137:137/udp"
       - "138:138/udp"
       - "139:139"
-      - "445:445"
+      - "1445:445" # Revert to 445 if you don't need to access from Windows
     volumes:
       - ${STORAGE_BASE}/nas:/data
+    networks:
+      - lan_net
 
   filebrowser:
     image: filebrowser/filebrowser
     container_name: filebrowser
     ports:
-      - "8080:80"
+      - "18080:80"
     volumes:
       - ${STORAGE_BASE}/nas:/srv
-      # - ./volumes/nas:/srv
     restart: always
+    networks:
+      - lan_net
+
+networks:
+  lan_net:
+    external: true

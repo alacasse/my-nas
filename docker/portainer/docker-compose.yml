@@ -8,6 +8,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
+    networks:
+      - lan_net
 
 volumes:
   portainer_data:
@@ -16,3 +18,7 @@ volumes:
       type: none
       device: ${STORAGE_BASE}/portainer_data
       o: bind
+
+networks:
+  lan_net:
+    external: true
