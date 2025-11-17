@@ -1,9 +1,11 @@
 # Infrastructure Tooling
 
-This folder will host scripts/manifests for bootstrapping the NAS:
+This folder hosts scripts/manifests for bootstrapping the NAS:
 
-- `k3s-install/` with automation for Ubuntu 24.04.3 LTS install steps.
-- `flux-bootstrap/` instructions and manifests for FluxCD + SOPS keys.
-- `sops/` helper scripts for key generation and secret encryption.
+- `os-install/` – Ubuntu autoinstall config, ISO builder, and local VM test harness.
+- `k3s-install/` – automation for bringing up k3s on Ubuntu 24.04.3 LTS (planned).
+- `flux-bootstrap/` – instructions and manifests for FluxCD + SOPS keys (planned).
+- `sops/` – helper scripts for key generation and secret encryption (planned).
+- `install-docker.sh` – installs Docker Engine + Compose plugin, writes sane daemon defaults, and adds a service account to the docker group.
 
 Populate these directories as the project evolves.

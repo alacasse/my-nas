@@ -23,6 +23,7 @@
    - Outline export/import steps to ensure the pool can be remounted after the OS reinstall.
    - Consider backups or snapshots before hardware changes.
    - For testing: recreate a small ZFS pool inside a local VM to validate automation/scripts before touching production disks.
+   - Author an Ubuntu autoinstall configuration so SSD installs are repeatable; test it inside a local VM prior to using IPMI on the NAS.
 3. **Define Kubernetes Baseline**
    - Install k3s (likely single-node control plane), decide on bundled components (Traefik ingress, metrics-server).
    - Use a ZFS CSI driver (e.g., democratic-csi) configured against the existing ZFS pool for dynamic PersistentVolumes.
@@ -39,6 +40,7 @@
     - Flux can target the dev cluster via a separate `clusters/dev` overlay while production points to the NAS k3s cluster.
     - Use hostPath or lightweight storage classes locally; production overlays reference the ZFS CSI StorageClass.
     - Automate this path (scripts or CI): create k3d cluster → install Flux → apply manifests → run health checks → destroy cluster.
+    - For OS/bootstrap work, run the autoinstall ISO plus Ansible playbooks inside a local VM (QEMU/KVM or QEMU-in-Docker) to validate each change before touching hardware.
 
 ## Suggested Additional Services
 - **Monitoring/Logging Stack** (confirmed)
@@ -52,6 +54,9 @@
   - Install FluxCD on the k3s cluster (Ubuntu Server 24.04.3 base) to manage all Kubernetes manifests from this repository.
   - Integrate SOPS for secret encryption (Flux decrypts at apply time) and optionally RenovateBot for automated image/chart updates.
   - Rely on Flux’s continuous reconciliation to prevent drift and provide reproducible homelab infrastructure.
+- **Provisioning Automation**
+  - Use Ubuntu autoinstall (cloud-init) to provision the SSD consistently; maintain the YAML config in `infrastructure/os-install/`.
+  - Layer Ansible playbooks on top for post-install configuration (packages, hardening, k3s prerequisites); test both pieces inside local VMs.
 - **Secrets & GitOps**
   - Standardize on FluxCD for Git-driven reconciliation and SOPS for managing encrypted secrets within this repo.
 
