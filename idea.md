@@ -1,0 +1,1 @@
+- make sure that all the apps write their logs somewhere they can then be read by another software that will aggregate them and will allow them to be seen from inside the local network through its web interface

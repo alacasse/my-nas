@@ -36,7 +36,11 @@ multipass info nas-test
 ```bash
 multipass shell nas-test
 sudo apt update && sudo apt install -y git
-git clone https://<your-origin>/my-nas.git ~/my-nas   # or multipass transfer from host
+git clone git@github.com:alacasse/my-nas.git ~/my-nas   # or multipass transfer from host
+or
+multipass transfer --recursive --parents ./ nas-test:/home/ubuntu/my-nas
+or
+multipass mount ./ nas-test:/home/ubuntu/my-nas # works well for iterating on dev
 cd ~/my-nas
 ```
 
@@ -54,16 +58,29 @@ docker ps       # should work without sudo
 docker compose --env-file docker/.env.dev -f docker/vpn/docker-compose.yml ps
 docker compose --env-file docker/.env.dev -f docker/torrent/docker-compose.yml ps
 docker compose -f docker/nginx/docker-compose.yml ps
+./scripts/check-vpn-torrent.sh  # basic network/container/health checks
 ```
-Hit the exposed ports/hosts from inside the VM (check compose files for port mappings).
+Storage defaults to `/home/ubuntu/nas-volumes` (see `docker/.env.dev`); mounts are auto-created by the setup script. Hit the exposed ports/hosts from inside the VM (check compose files for port mappings). The check script also tries to reach the torrent UI from the VPN container and fetch an external IP via the VPN; warnings may appear if outbound network is blocked or curl/wget is absent—rebuild the VPN image to add tools (Dockerfile already has curl).
+Setup in /etc/hosts: 10.120.238.107 logs.nas.test torrent.nas.test portainer.nas.test filebrowser.nas.test
 
-## 8) (Optional) Kubernetes rehearsal inside VM
+## 8) Observability stack (logs + metrics)
+```bash
+docker compose -f docker/observability/docker-compose.yml up -d
+docker compose -f docker/observability/docker-compose.yml ps
+```
+- Loki for logs, Promtail scraping Docker/system logs, Prometheus scraping node-exporter + smartctl-exporter, Grafana on :3000 (admin/admin by default).
+- Add `/etc/hosts` entry for Grafana via nginx: `logs.localhost <VM_IP>` then visit http://logs.localhost (nginx proxies to Grafana). You can also hit http://<VM_IP>:3000 directly.
+
+10.120.238.107 logs.localhost torrent.localhost portainer.localhost filebrowser.localhost
+Then hit http://logs.localhost (Grafana via nginx), http://torrent.localhost (qbittorrent UI), etc. If you expose services directly (e.g., Grafana on 3000), you can also browse to http://10.120.238.107:3000. The 172.x/10.x you see inside Docker are internal; keep using the Multipass IP for host→VM access.
+
+## 9) (Optional) Kubernetes rehearsal inside VM
 - Install k3d: `curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | sudo bash`
 - Create cluster: `k3d cluster create nas-sim -p "80:80@loadbalancer" -p "443:443@loadbalancer"`
 - Context: `kubectl config use-context k3d-nas-sim`
 - Note: `clusters/dev` currently has no K8s manifests; add them before applying.
 
-## 9) Teardown when done
+## 10) Teardown when done
 ```bash
 exit   # leave VM shell
 multipass delete nas-test
