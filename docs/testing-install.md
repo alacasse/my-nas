@@ -69,10 +69,10 @@ docker compose -f docker/observability/docker-compose.yml up -d
 docker compose -f docker/observability/docker-compose.yml ps
 ```
 - Loki for logs, Promtail scraping Docker/system logs, Prometheus scraping node-exporter + smartctl-exporter, Grafana on :3000 (admin/admin by default).
-- Add `/etc/hosts` entry for Grafana via nginx: `logs.localhost <VM_IP>` then visit http://logs.localhost (nginx proxies to Grafana). You can also hit http://<VM_IP>:3000 directly.
+- Add `/etc/hosts` entry for Grafana via nginx: `logs.nas.test <VM_IP>` then visit http://logs.nas.test (nginx proxies to Grafana). You can also hit http://<VM_IP>:3000 directly.
 
-10.120.238.107 logs.localhost torrent.localhost portainer.localhost filebrowser.localhost
-Then hit http://logs.localhost (Grafana via nginx), http://torrent.localhost (qbittorrent UI), etc. If you expose services directly (e.g., Grafana on 3000), you can also browse to http://10.120.238.107:3000. The 172.x/10.x you see inside Docker are internal; keep using the Multipass IP for host→VM access.
+10.120.238.107 logs.nas.test torrent.nas.test portainer.nas.test filebrowser.nas.test
+Then hit http://logs.nas.test (Grafana via nginx), http://torrent.nas.test (qbittorrent UI), etc. If you expose services directly (e.g., Grafana on 3000), you can also browse to http://10.120.238.107:3000. The 172.x/10.x you see inside Docker are internal; keep using the Multipass IP for host→VM access.
 
 ## 9) (Optional) Kubernetes rehearsal inside VM
 - Install k3d: `curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | sudo bash`

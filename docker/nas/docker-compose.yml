@@ -3,7 +3,7 @@ services:
     image: dperson/samba
     container_name: samba
     restart: always
-    command: "-u 'user;password' -s 'public;/data;yes;no'"
+    command: "-u '${NAS_USER};${NAS_PASSWORD}' -s 'public;/data;yes;no'"
     ports:
       - "137:137/udp"
       - "138:138/udp"
@@ -17,6 +17,9 @@ services:
   filebrowser:
     image: filebrowser/filebrowser
     container_name: filebrowser
+    environment:
+      - FB_USERNAME=${NAS_USER}
+      - FB_PASSWORD=${NAS_PASSWORD}
     ports:
       - "18080:80"
     volumes:

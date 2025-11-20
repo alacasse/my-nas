@@ -27,10 +27,10 @@ docker compose --env-file ./docker/.env.dev -f ./docker/portainer/docker-compose
 docker compose --env-file  docker/.env.dev -f docker/vpn/docker-compose.yml up -d --build
 
 # Access portainer:
-portainer.localhost
+portainer.nas.test
 
 # Access portainer:
-torrent.localhost
+torrent.nas.test
 
 # If portainer cannot find its volumes while starting
 docker rm portainer

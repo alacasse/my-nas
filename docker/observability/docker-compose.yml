@@ -2,7 +2,7 @@ services:
   loki:
     image: grafana/loki:2.9.4
     container_name: loki
-    command: ["-config.file=/etc/loki/local-config.yml"]
+    command: [ "-config.file=/etc/loki/local-config.yml" ]
     volumes:
       - ./loki-config.yml:/etc/loki/local-config.yml:ro
       - loki-data:/loki
@@ -13,7 +13,7 @@ services:
   promtail:
     image: grafana/promtail:2.9.4
     container_name: promtail
-    command: ["-config.file=/etc/promtail/config.yml"]
+    command: [ "-config.file=/etc/promtail/config.yml" ]
     volumes:
       - ./promtail-config.yml:/etc/promtail/config.yml:ro
       - /var/log:/var/log:ro
@@ -44,8 +44,8 @@ services:
       - loki
       - prometheus
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=${NAS_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${NAS_PASSWORD}
       - GF_AUTH_ANONYMOUS_ENABLED=false
     volumes:
       - grafana-data:/var/lib/grafana

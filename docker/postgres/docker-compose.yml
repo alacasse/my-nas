@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${NAS_USER}
+      POSTGRES_PASSWORD: ${NAS_PASSWORD}
+      POSTGRES_DB: nas_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lan_net
+    restart: unless-stopped
+
+networks:
+  lan_net:
+    external: true
+
+volumes:
+  postgres_data:
