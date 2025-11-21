@@ -15,7 +15,13 @@ if [ -z "$STORAGE_BASE_VAL" ]; then
   STORAGE_BASE_VAL="$HOME/nas-volumes"
 fi
 
-# Create storage directory
+# Check Docker version first
+./check-docker-version.sh
+if [ $? -ne 0 ]; then
+    exit 1
+fi
+
+# Create necessary directoriesy
 mkdir -p "${STORAGE_BASE_VAL}/nas"
 
 # Create Docker network if not exists
