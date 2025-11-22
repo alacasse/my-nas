@@ -7,35 +7,40 @@ if [ -f "$ENV_FILE" ]; then
   export $(grep -v '^#' "$ENV_FILE" | xargs)
 fi
 
-PASS="${NAS_PASSWORD:-password}"
-CONF_FILE="$HOME/nas-volumes/qbittorrent/appdata/qBittorrent/config/qBittorrent.conf"
+CONTAINER_NAME="qbittorrentvpn"
+CONFIG_PATH="/config/qBittorrent/config/qBittorrent.conf"
 
-if [ ! -f "$CONF_FILE" ]; then
-  echo "Config file not found at $CONF_FILE. Is qBittorrent running?"
-  exit 1
+echo "Checking if container $CONTAINER_NAME is running..."
+if ! docker ps | grep -q "$CONTAINER_NAME"; then
+  echo "Container $CONTAINER_NAME is not running. Starting it..."
+  docker start "$CONTAINER_NAME"
+  sleep 5
 fi
 
-echo "Configuring qBittorrent to bypass auth for LAN..."
-# Stop container first to prevent overwrite
-docker stop qbittorrentvpn
+echo "Configuring qBittorrent to bypass auth for LAN (using docker exec)..."
+
+# Helper function to run sed inside container
+docker_sed() {
+  docker exec "$CONTAINER_NAME" sed -i "$1" "$CONFIG_PATH"
+}
 
 # Remove existing password and username lines
-sed -i '/WebUI\\Password_PBKDF2/d' "$CONF_FILE"
-sed -i '/WebUI\\Username/d' "$CONF_FILE"
+docker_sed '/WebUI\\Password_PBKDF2/d'
+docker_sed '/WebUI\\Username/d'
 
 # Remove existing whitelist lines to avoid duplicates
-sed -i '/WebUI\\AuthSubnetWhitelist/d' "$CONF_FILE"
-sed -i '/WebUI\\TrustedProxies/d' "$CONF_FILE"
+docker_sed '/WebUI\\AuthSubnetWhitelist/d'
+docker_sed '/WebUI\\TrustedProxies/d'
 
 # Add whitelist configuration under [Preferences]
 # Whitelist: LAN (192.168.50.0/24), Docker (172.19.0.0/24), Localhost
-sed -i "/\[Preferences\]/a WebUI\\\\AuthSubnetWhitelist=192.168.50.0/24,172.19.0.0/24,127.0.0.1/32" "$CONF_FILE"
-sed -i "/\[Preferences\]/a WebUI\\\\AuthSubnetWhitelistEnabled=true" "$CONF_FILE"
-sed -i "/\[Preferences\]/a WebUI\\\\LocalHostAuth=false" "$CONF_FILE"
+docker_sed "/\[Preferences\]/a WebUI\\\\AuthSubnetWhitelist=192.168.50.0/24,172.19.0.0/24,127.0.0.1/32"
+docker_sed "/\[Preferences\]/a WebUI\\\\AuthSubnetWhitelistEnabled=true"
+docker_sed "/\[Preferences\]/a WebUI\\\\LocalHostAuth=false"
 # Trust Nginx proxy (Docker subnet)
-sed -i "/\[Preferences\]/a WebUI\\\\TrustedProxies=172.19.0.0/24" "$CONF_FILE"
+docker_sed "/\[Preferences\]/a WebUI\\\\TrustedProxies=172.19.0.0/24"
 
-echo "Restarting qBittorrent VPN container..."
-docker start qbittorrentvpn
+echo "Restarting qBittorrent VPN container to apply changes..."
+docker restart "$CONTAINER_NAME"
 
 echo "qBittorrent password set to: $PASS"

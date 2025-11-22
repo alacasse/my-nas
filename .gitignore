@@ -1,1 +1,4 @@
 nas-volumes
+docker/torrent/vpn-config/credentials.conf
+docker/.env.dev
+*.ovpn

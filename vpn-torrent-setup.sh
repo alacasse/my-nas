@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Check execution context
+./check-vm-context.sh || exit 1
+
 # Define network
 NETWORK_NAME="lan_net"
 SUBNET="172.19.0.0/24"
