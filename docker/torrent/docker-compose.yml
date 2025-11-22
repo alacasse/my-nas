@@ -1,31 +1,36 @@
 services:
-  torrent:
-    image: ghcr.io/linuxserver/qbittorrent
-    container_name: torrent
-    networks:
-      vpn_net:
-        ipv4_address: 172.18.0.10
-      lan_net: {}
-    dns:
-      - 192.168.50.124
-      # - 1.1.1.1
-      # - 8.8.8.8
+  qbittorrentvpn:
+    image: binhex/arch-qbittorrentvpn
+    container_name: qbittorrentvpn
     cap_add:
       - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
     environment:
+      - VPN_ENABLED=yes
+      - VPN_USER=${VPN_USER}
+      - VPN_PASS=${VPN_PASS}
+      - VPN_PROV=custom
+      - VPN_CLIENT=openvpn
+      - LAN_NETWORK=${LAN_NETWORK}
+      - NAME_SERVERS=1.1.1.1,8.8.8.8
+      - WEBUI_PORT=8080
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
-      - WEBUI_PORT=8080
-      - TORRENTING_PORT=6881
+      - TZ=America/Montreal
+      - DEBUG=false
     volumes:
-      - ./change-route.sh:/etc/cont-init.d/change-route.sh:ro
       - ${STORAGE_BASE}/qbittorrent/appdata:/config
-      - ${STORAGE_BASE}/nas/downloads:/downloads #optional
+      - ${STORAGE_BASE}/nas/downloads:/data
+      - ./vpn-config:/config/openvpn
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    networks:
+      - lan_net
     restart: unless-stopped
 
 networks:
-  vpn_net:
-    external: true
   lan_net:
     external: true

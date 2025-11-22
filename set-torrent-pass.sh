@@ -8,37 +8,34 @@ if [ -f "$ENV_FILE" ]; then
 fi
 
 PASS="${NAS_PASSWORD:-password}"
-CONF_FILE="$HOME/nas-volumes/qbittorrent/appdata/qBittorrent/qBittorrent.conf"
+CONF_FILE="$HOME/nas-volumes/qbittorrent/appdata/qBittorrent/config/qBittorrent.conf"
 
 if [ ! -f "$CONF_FILE" ]; then
   echo "Config file not found at $CONF_FILE. Is qBittorrent running?"
   exit 1
 fi
 
-echo "Generating hash for password..."
-# Generate PBKDF2-HMAC-SHA512 hash (qBittorrent 4.2+ format)
-HASH=$(python3 -c "
-import base64, hashlib, os
-password = '$PASS'
-salt = os.urandom(16)
-iterations = 100000
-dk = hashlib.pbkdf2_hmac('sha512', password.encode(), salt, iterations)
-print(f'@ByteArray({base64.b64encode(salt + dk).decode()})')
-")
+echo "Configuring qBittorrent to bypass auth for LAN..."
+# Stop container first to prevent overwrite
+docker stop qbittorrentvpn
 
-echo "Updating config file..."
-# Remove existing password line if present
+# Remove existing password and username lines
 sed -i '/WebUI\\Password_PBKDF2/d' "$CONF_FILE"
-# Add new password line under [Preferences]
-sed -i "/\[Preferences\]/a WebUI\\\\Password_PBKDF2=$HASH" "$CONF_FILE"
-# Ensure username is admin
 sed -i '/WebUI\\Username/d' "$CONF_FILE"
-sed -i "/\[Preferences\]/a WebUI\\\\Username=admin" "$CONF_FILE"
 
-echo "Restarting torrent container..."
-docker stop torrent
-docker network disconnect -f lan_net torrent || true
-docker network disconnect -f vpn_net torrent || true
-docker start torrent
+# Remove existing whitelist lines to avoid duplicates
+sed -i '/WebUI\\AuthSubnetWhitelist/d' "$CONF_FILE"
+sed -i '/WebUI\\TrustedProxies/d' "$CONF_FILE"
+
+# Add whitelist configuration under [Preferences]
+# Whitelist: LAN (192.168.50.0/24), Docker (172.19.0.0/24), Localhost
+sed -i "/\[Preferences\]/a WebUI\\\\AuthSubnetWhitelist=192.168.50.0/24,172.19.0.0/24,127.0.0.1/32" "$CONF_FILE"
+sed -i "/\[Preferences\]/a WebUI\\\\AuthSubnetWhitelistEnabled=true" "$CONF_FILE"
+sed -i "/\[Preferences\]/a WebUI\\\\LocalHostAuth=false" "$CONF_FILE"
+# Trust Nginx proxy (Docker subnet)
+sed -i "/\[Preferences\]/a WebUI\\\\TrustedProxies=172.19.0.0/24" "$CONF_FILE"
+
+echo "Restarting qBittorrent VPN container..."
+docker start qbittorrentvpn
 
 echo "qBittorrent password set to: $PASS"
