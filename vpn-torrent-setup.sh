@@ -27,7 +27,10 @@ else
 fi
 
 # Ensure storage directories exist for qbittorrent binds
-mkdir -p "${STORAGE_BASE_VAL}/qbittorrent/appdata" "${STORAGE_BASE_VAL}/nas/downloads"
+mkdir -p "${STORAGE_BASE_VAL}/qbittorrent/appdata/qBittorrent/config" "${STORAGE_BASE_VAL}/nas/downloads"
+
+# Copy qBittorrent config
+cp ./docker/torrent/qBittorrent.conf "${STORAGE_BASE_VAL}/qbittorrent/appdata/qBittorrent/config/qBittorrent.conf"
 
 # Start qBittorrent VPN container
 echo "Starting qBittorrent VPN container..."
