@@ -6,6 +6,6 @@ To run the setup script, we must execute it inside the `nas-test` VM using `mult
 
 1. Run the setup script:
    ```bash
-   multipass exec nas-test -- /home/ubuntu/my-nas/vpn-torrent-setup.sh
+   multipass exec nas-test -- bash -c "cd /home/ubuntu/my-nas && ./vpn-torrent-setup.sh"
    ```
    *(Note: Adjust the path inside the VM if it differs from `/home/ubuntu/my-nas`)*

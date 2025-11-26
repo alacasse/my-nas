@@ -13,6 +13,9 @@ ingester:
     final_sleep: 0s
   chunk_idle_period: 5m
   max_chunk_age: 1h
+  wal:
+    enabled: true
+    dir: /loki/wal
 
 limits_config:
   ingestion_rate_mb: 10

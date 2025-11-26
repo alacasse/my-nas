@@ -1,7 +1,7 @@
 client
 dev tun
 proto tcp
-remote 94.156.148.165 443
+remote 185.213.80.134 443
 resolv-retry infinite
 remote-random
 nobind
@@ -13,7 +13,7 @@ ping 15
 ping-restart 0
 ping-timer-rem
 comp-lzo no
-verify-x509-name CN=ca1803.nordvpn.com
+verify-x509-name CN=ca1622.nordvpn.com
 
 remote-cert-tls server
 

@@ -7,9 +7,5 @@ CUSTOM_NETWORK="lan_net"  # Match what was created in setup
 echo "Stopping Torrent container..."
 docker compose --env-file ./docker/.env.dev -f "$TORRENT_COMPOSE_FILE" down
 
-
-
-echo "Removing custom Docker network if exists..."
-docker network inspect "$CUSTOM_NETWORK" &>/dev/null && docker network rm "$CUSTOM_NETWORK"
-
+# Network is shared, do not remove it.
 echo "Teardown complete."

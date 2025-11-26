@@ -4,7 +4,7 @@ services:
     container_name: loki
     command: [ "-config.file=/etc/loki/local-config.yml" ]
     volumes:
-      - ./loki-config.yml:/etc/loki/local-config.yml:ro
+      - ${LOKI_CONFIG:-./loki-config.yml}:/etc/loki/local-config.yml:ro
       - loki-data:/loki
     networks:
       - lan_net
@@ -15,7 +15,7 @@ services:
     container_name: promtail
     command: [ "-config.file=/etc/promtail/config.yml" ]
     volumes:
-      - ./promtail-config.yml:/etc/promtail/config.yml:ro
+      - ${PROMTAIL_CONFIG:-./promtail-config.yml}:/etc/promtail/config.yml:ro
       - /var/log:/var/log:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -31,7 +31,7 @@ services:
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=15d"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${PROMETHEUS_CONFIG:-./prometheus.yml}:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     networks:
       - lan_net
@@ -49,7 +49,7 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=false
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ${GRAFANA_PROVISIONING:-./grafana/provisioning}:/etc/grafana/provisioning:ro
     ports:
       - "3000:3000"
     networks:
