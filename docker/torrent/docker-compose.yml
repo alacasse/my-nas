@@ -21,7 +21,9 @@ services:
       - DEBUG=false
     volumes:
       - ${STORAGE_BASE}/qbittorrent/appdata:/config
-      - ${STORAGE_BASE}/nas/downloads:/data
+      - ${STORAGE_BASE}/nas/downloads:/data/downloads
+      - ${STORAGE_BASE}/nas/torrents:/data/torrents
+      - ${STORAGE_BASE}/qbittorrent/logs:/var/log/qbittorrent
       - ./vpn-config:/config/openvpn
     ports:
       - "8080:8080"

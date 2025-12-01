@@ -19,6 +19,7 @@ services:
       - /var/log:/var/log:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${STORAGE_BASE}/qbittorrent/logs:/etc/promtail/logs/qbittorrent:ro
     networks:
       - lan_net
     restart: unless-stopped

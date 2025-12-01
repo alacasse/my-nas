@@ -64,6 +64,24 @@ else
   echo "qBittorrent config already exists. Skipping copy."
 fi
 
+# Copy qBittorrent categories (only if it doesn't exist)
+CATEGORIES_PATH="${STORAGE_BASE_VAL}/qbittorrent/appdata/qBittorrent/config/categories.json"
+if [ ! -f "$CATEGORIES_PATH" ]; then
+  echo "Copying categories..."
+  cp ./docker/torrent/categories.json "$CATEGORIES_PATH"
+else
+  echo "Categories already exists. Skipping copy."
+fi
+
+# Copy qBittorrent watched folders (only if it doesn't exist)
+WATCHED_FOLDERS_PATH="${STORAGE_BASE_VAL}/qbittorrent/appdata/qBittorrent/config/watched_folders.json"
+if [ ! -f "$WATCHED_FOLDERS_PATH" ]; then
+  echo "Copying watched folders..."
+  cp ./docker/torrent/watched_folders.json "$WATCHED_FOLDERS_PATH"
+else
+  echo "Watched folders already exists. Skipping copy."
+fi
+
 # Set WebUI Password
 PASS_VAL="${QBIT_WEBUI_PASS:-adminadmin}"
 echo "Setting qBittorrent WebUI password..."
