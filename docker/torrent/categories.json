@@ -1,11 +1,11 @@
 {
     "Movies": {
-        "save_path": "/data/movies"
+        "save_path": "/data/downloads/movies"
     },
     "Series": {
-        "save_path": "data/series"
+        "save_path": "/data/downloads/series"
     },
     "Books": {
-        "save_path": "data/books"
+        "save_path": "/data/downloads/books"
     }
 }
