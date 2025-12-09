@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-config
+  namespace: dashboard
+data:
+  # Homepage configuration files
+  # Documentation: https://gethomepage.dev/latest/configs/
+  
+  settings.yaml: |
+    title: NAS Dashboard
+    favicon: https://raw.githubusercontent.com/gethomepage/homepage/main/public/favicon.ico
+    theme: dark
+    color: slate
+    headerStyle: clean
+    layout:
+      Management:
+        style: row
+        columns: 2
+      Media:
+        style: row
+        columns: 2
+      Monitoring:
+        style: row
+        columns: 3
+
+  services.yaml: |
+    - Management:
+        - Portainer:
+            href: http://portainer.nas.test
+            description: Container Management
+            icon: portainer
+        - Filebrowser:
+            href: http://files.nas.test
+            description: File Management
+            icon: filebrowser
+    - Media:
+        - qBittorrent:
+            href: http://torrent.nas.test
+            description: Torrent Client
+            icon: qbittorrent
+    - Monitoring:
+        - Grafana:
+            href: http://grafana.nas.test
+            description: Metrics Dashboard
+            icon: grafana
+        - Prometheus:
+            href: http://prometheus.nas.test
+            description: Metrics Database
+            icon: prometheus
+
+  widgets.yaml: |
+    - kubernetes:
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+        nodes:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+    - datetime:
+        text_size: xl
+        format:
+          dateStyle: long
+          timeStyle: short
+          hourCycle: h23
+
+  bookmarks.yaml: |
+    - Documentation:
+        - Kubernetes:
+            - href: https://kubernetes.io/docs/
+              icon: kubernetes
+        - K3S:
+            - href: https://docs.k3s.io/
+              icon: k3s
+        - FluxCD:
+            - href: https://fluxcd.io/flux/
+              icon: flux-cd
+
+  docker.yaml: ""
+  
+  kubernetes.yaml: |
+    mode: cluster

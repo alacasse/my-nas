@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dashboard
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: management
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: torrents
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability

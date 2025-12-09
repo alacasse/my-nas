@@ -1,0 +1,137 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qbittorrent-defaults
+  namespace: torrents
+data:
+  qBittorrent.conf: |
+    [Application]
+    FileLogger\Age=1
+    FileLogger\AgeType=1
+    FileLogger\Backup=true
+    FileLogger\DeleteOld=true
+    FileLogger\Enabled=true
+    FileLogger\MaxSizeBytes=512000
+    FileLogger\Path=/var/log/qbittorrent
+
+    [BitTorrent]
+    Session\DefaultSavePath=/data/downloads
+    Session\Port=6881
+    Session\QueueingSystemEnabled=false
+    Session\TempPath=/data/downloads/temp
+    Session\TempPathEnabled=true
+
+    [Core]
+    AutoDeleteAddedTorrentFile=IfAdded
+
+    [LegalNotice]
+    Accepted=true
+
+    [Meta]
+    MigrationVersion=6
+
+    [Network]
+    Cookies=@Invalid()
+    PortForwardingEnabled=false
+
+    [Preferences]
+    WebUI\Address=*
+    WebUI\AlternativeUIEnabled=false
+    WebUI\AuthSubnetWhitelist=10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+    WebUI\AuthSubnetWhitelistEnabled=true
+    WebUI\BanDuration=3600
+    WebUI\CSRFProtection=true
+    WebUI\ClickjackingProtection=true
+    WebUI\CustomHTTPHeaders=
+    WebUI\CustomHTTPHeadersEnabled=false
+    WebUI\HTTPS\Enabled=false
+    WebUI\HostHeaderValidation=true
+    WebUI\LocalHostAuth=false
+    WebUI\MaxAuthenticationFailCount=5
+    WebUI\Password_PBKDF2="@ByteArray(RulusNN8N7A=:iEi3UR2z5OVd7dJlMEMNJGPndCyDGHmqq93c6hLpAKBXYcGOhGG0A+bhT89gMNJQvWbIw6OT6ck0Fn9IKC38aA==)"
+    WebUI\Port=8080
+    WebUI\ReverseProxySupportEnabled=false
+    WebUI\SecureCookie=true
+    WebUI\ServerDomains=*
+    WebUI\SessionTimeout=3600
+    WebUI\TrustedReverseProxiesList=
+    WebUI\UseUPnP=true
+    WebUI\Username=admin
+
+  categories.json: |
+    {
+        "movies": {
+            "save_path": "/data/downloads/movies"
+        },
+        "music": {
+            "save_path": "/data/downloads/music"
+        },
+        "shows": {
+            "save_path": "/data/downloads/shows"
+        }
+    }
+
+  watched_folders.json: |
+    {
+        "/data/torrents": {
+            "add_torrent_params": {
+                "category": "",
+                "content_layout": "Original",
+                "download_limit": -1,
+                "download_path": "",
+                "operating_mode": "AutoManaged",
+                "ratio_limit": -2,
+                "save_path": "",
+                "seeding_time_limit": -2,
+                "skip_checking": false,
+                "stopped": false,
+                "upload_limit": -1,
+                "use_auto_tmm": true,
+                "use_download_path": false
+            },
+            "recursive": false
+        }
+    }
+
+  init.sh: |
+    #!/bin/bash
+    set -e
+    # qBittorrent stores configs in different locations:
+    # - qBittorrent.conf goes in /config/qBittorrent/config/
+    # - categories.json and watched_folders.json go in /config/qBittorrent/
+    CONF_DIR="/config/qBittorrent/config"
+    DATA_DIR="/config/qBittorrent"
+    DEFAULTS_DIR="/defaults"
+    
+    echo "=== qBittorrent Config Initialization ==="
+    mkdir -p "$CONF_DIR"
+    mkdir -p "$DATA_DIR"
+    
+    # Function to copy if missing or empty stub
+    copy_if_needed() {
+      local src="$1"
+      local dest="$2"
+      local name=$(basename "$src")
+      if [ ! -f "$dest" ]; then
+        echo "Copying $name (file missing)..."
+        cp "$src" "$dest"
+      elif [ $(stat -c%s "$dest" 2>/dev/null || echo 0) -lt 10 ]; then
+        echo "Overwriting $name (empty stub, < 10 bytes)..."
+        cp "$src" "$dest"
+      else
+        echo "$name already exists with content, skipping."
+      fi
+    }
+    
+    # qBittorrent.conf goes in config subdir
+    copy_if_needed "$DEFAULTS_DIR/qBittorrent.conf" "$CONF_DIR/qBittorrent.conf"
+    
+    # categories and watched_folders go in parent dir
+    copy_if_needed "$DEFAULTS_DIR/categories.json" "$DATA_DIR/categories.json"
+    copy_if_needed "$DEFAULTS_DIR/watched_folders.json" "$DATA_DIR/watched_folders.json"
+    
+    # Set ownership
+    chown -R 1000:1000 /config
+    echo "=== Config initialization complete ==="
+
+

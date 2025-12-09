@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vpn-openvpn-config
+  namespace: torrents
+data:
+  # User should replace this with their actual .ovpn content
+  # or we can leave it empty if the container supports dynamic generation
+  # But binhex/arch-qbittorrentvpn usually wants a specific file if VPN_PROV=custom
+  custom.ovpn: |
+    client
+    dev tun
+    proto tcp
+    remote ca.ipvanish.com 443
+    resolv-retry infinite
+    nobind
+    persist-key
+    persist-tun
+    persist-remote-ip
+    ca ca.crt
+    verify-x509-name ca.ipvanish.com name
+    auth-user-pass
+    comp-lzo
+    verb 3
+    auth SHA256
+    cipher AES-256-CBC
+    keysize 256
+    tls-cipher TLS-DHE-RSA-WITH-AES-256-CBC-SHA:TLS-DHE-DSS-WITH-AES-256-CBC-SHA:TLS-RSA-WITH-AES-256-CBC-SHA

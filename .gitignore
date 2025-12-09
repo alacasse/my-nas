@@ -2,3 +2,7 @@ nas-volumes
 docker/torrent/vpn-config/credentials.conf
 docker/.env.dev
 *.ovpn
+
+# VPN credentials (new location)
+apps/qbittorrent/vpn-config/credentials.conf
+

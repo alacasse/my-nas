@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Development environment overlay
+# Uses local-path storage class (K3S default)
+
+resources:
+  - ../../apps/base
+
+patches:
+  # Use local-path storage class for dev
+  - target:
+      kind: PersistentVolumeClaim
+    patch: |-
+      - op: replace
+        path: /spec/storageClassName
+        value: local-path

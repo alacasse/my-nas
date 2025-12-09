@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Base configuration - references all applications
+# Environment-specific overlays in clusters/dev and clusters/prod
+
+resources:
+  - namespaces.yaml
+  - ../homepage
+  - ../portainer
+  - ../qbittorrent
