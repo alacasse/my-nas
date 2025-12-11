@@ -57,7 +57,14 @@ if [ "$MODE" = "prod" ]; then
         --branch=main \
         --path=clusters/prod \
         --personal
-else
+    
+    # Patch the Flux Kustomization to enable SOPS decryption
+    echo "Enabling SOPS decryption on flux-system..."
+    sudo k3s kubectl patch kustomization flux-system \
+        --namespace flux-system \
+        --type=merge \
+        --patch '{"spec": {"decryption": {"provider": "sops", "secretRef": {"name": "sops-age"}}}}'
+    echo "✓ Enabled SOPS decryption"else
     # Development: Local-only installation (no Git required)
     echo "Installing Flux in local-only mode (no Git integration)..."
     flux install
@@ -66,6 +73,24 @@ else
     echo "      Or use the deploy-dev.sh script for automated deployment."
 fi
 
+# 4b. Configure SOPS Decryption Key
+echo ""
+echo "Step 4b: Configuring SOPS decryption key..."
+if [ -f "$HOME/.config/sops/age/keys.txt" ]; then
+    echo "Found Age key at $HOME/.config/sops/age/keys.txt"
+    # Ensure namespace exists (it should from flux install/bootstrap)
+    sudo k3s kubectl create namespace flux-system --dry-run=client -o yaml | sudo k3s kubectl apply -f -
+    
+    # Create the secret
+    sudo k3s kubectl create secret generic sops-age \
+        --namespace=flux-system \
+        --from-file=age.agekey="$HOME/.config/sops/age/keys.txt" \
+        --dry-run=client -o yaml | sudo k3s kubectl apply -f -
+    echo "✓ Created 'sops-age' secret in flux-system"
+else
+    echo "WARNING: No Age key found at $HOME/.config/sops/age/keys.txt"
+    echo "Secrets decryption will fail until you create the 'sops-age' secret manually."
+fi
 # 5. Verify Flux installation
 echo ""
 echo "Step 5: Verifying Flux installation..."

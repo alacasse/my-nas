@@ -6,12 +6,34 @@ kind: Kustomization
 
 resources:
   - ../../apps/base
+  - pv.yaml
 
 patches:
-  # Use local-path storage class for dev
+  # Use manual PV binding for dev
   - target:
       kind: PersistentVolumeClaim
+      name: qbittorrent-config
     patch: |-
       - op: replace
         path: /spec/storageClassName
         value: local-path
+  - target:
+      kind: PersistentVolumeClaim
+      name: nas-downloads
+    patch: |-
+      - op: replace
+        path: /spec/storageClassName
+        value: dev-hostpath
+      - op: add
+        path: /spec/volumeName
+        value: nas-downloads-pv
+  - target:
+      kind: PersistentVolumeClaim
+      name: nas-torrents
+    patch: |-
+      - op: replace
+        path: /spec/storageClassName
+        value: dev-hostpath
+      - op: add
+        path: /spec/volumeName
+        value: nas-torrents-pv

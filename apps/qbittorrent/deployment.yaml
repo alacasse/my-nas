@@ -53,6 +53,10 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
+        - name: data
+          mountPath: /data
+        - name: cache
+          mountPath: /cache
         - name: downloads
           mountPath: /data/downloads
         - name: torrents
@@ -74,6 +78,10 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
+        - name: data
+          mountPath: /data
+        - name: cache
+          mountPath: /cache
         - name: defaults
           mountPath: /defaults
       volumes:
@@ -84,6 +92,12 @@ spec:
       - name: config
         persistentVolumeClaim:
           claimName: qbittorrent-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: qbittorrent-data
+      - name: cache
+        persistentVolumeClaim:
+          claimName: qbittorrent-cache
       - name: downloads
         persistentVolumeClaim:
           claimName: nas-downloads
@@ -103,6 +117,6 @@ spec:
       # Let's map it to a ConfigMap named 'vpn-config-files' which we will create if needed.
       - name: vpn-config
         secret:
-          secretName: vpn-openvpn-config
+          secretName: vpn-credentials
           optional: true
 

@@ -6,6 +6,7 @@ kind: Kustomization
 
 resources:
   - ../../apps/base
+  - ../../apps/qbittorrent/secrets.enc.yaml
 
 patches:
   # Use ZFS storage class for prod

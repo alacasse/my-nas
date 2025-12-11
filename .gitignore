@@ -6,3 +6,6 @@ docker/.env.dev
 # VPN credentials (new location)
 apps/qbittorrent/vpn-config/credentials.conf
 
+
+# Generated secrets
+apps/qbittorrent/secret.yaml
