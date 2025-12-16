@@ -12,12 +12,19 @@ data:
     FileLogger\DeleteOld=true
     FileLogger\Enabled=true
     FileLogger\MaxSizeBytes=512000
-    FileLogger\Path=/var/log/qbittorrent
+    FileLogger\Path=/config/qBittorrent/logs
 
     [BitTorrent]
+    Session\AddTorrentStopped=false
     Session\DefaultSavePath=/data/downloads
+    Session\DisableAutoTMMByDefault=false
+    Session\DisableAutoTMMTriggers\CategorySavePathChanged=false
+    Session\DisableAutoTMMTriggers\DefaultSavePathChanged=false
+    Session\ExcludedFileNames=
     Session\Port=6881
     Session\QueueingSystemEnabled=false
+    Session\SSL\Port=12688
+    Session\ShareLimitAction=Stop
     Session\TempPath=/data/downloads/temp
     Session\TempPathEnabled=true
 
@@ -61,19 +68,19 @@ data:
   categories.json: |
     {
         "Movies": {
-            "save_path": "/data/downloads/movies"
+            "save_path": "__QBIT_MEDIA_ROOT__/movies"
         },
         "Music": {
-            "save_path": "/data/downloads/music"
+            "save_path": "__QBIT_MEDIA_ROOT__/music"
         },
         "Shows": {
-            "save_path": "/data/downloads/shows"
+            "save_path": "__QBIT_MEDIA_ROOT__/tv"
         },
         "Games": {
-            "save_path": "/data/downloads/games"
+            "save_path": "__QBIT_MEDIA_ROOT__/games"
         },
         "Books": {
-            "save_path": "/data/downloads/books"
+            "save_path": "__QBIT_MEDIA_ROOT__/books"
         }
     }
 
@@ -102,34 +109,47 @@ data:
   init.sh: |
     #!/bin/bash
     set -e
+
+    echo "=== qBittorrent Storage Initialization ==="
+
     CONF_DIR="/config/qBittorrent/config"
     DEFAULTS_DIR="/defaults"
-    
-    echo "=== qBittorrent Config Initialization ==="
+
+    # Ensure directory structure for config and logs inside the config PVC
     mkdir -p "$CONF_DIR"
-    
-    # Function to copy if missing or empty stub
+    mkdir -p "/config/qBittorrent/logs"
+
+    # Function to copy defaults only if missing
     copy_if_needed() {
       local src="$1"
       local dest="$2"
-      local name=$(basename "$src")
+      local name
+      name="$(basename "$src")"
       if [ ! -f "$dest" ]; then
         echo "Copying $name (file missing)..."
         cp "$src" "$dest"
-      elif [ $(stat -c%s "$dest" 2>/dev/null || echo 0) -lt 10 ]; then
-        echo "Overwriting $name (empty stub, < 10 bytes)..."
-        cp "$src" "$dest"
-      else
-        echo "$name already exists with content, skipping."
       fi
     }
-    
+
     copy_if_needed "$DEFAULTS_DIR/qBittorrent.conf" "$CONF_DIR/qBittorrent.conf"
-    copy_if_needed "$DEFAULTS_DIR/categories.json" "$CONF_DIR/categories.json"
+
+    # Render categories with configurable media root
+    QBIT_MEDIA_ROOT="${QBIT_MEDIA_ROOT:-/data}"
+    if [ ! -f "$CONF_DIR/categories.json" ]; then
+      echo "Rendering categories.json with media root: $QBIT_MEDIA_ROOT"
+      sed "s#__QBIT_MEDIA_ROOT__#${QBIT_MEDIA_ROOT}#g" "$DEFAULTS_DIR/categories.json" > "$CONF_DIR/categories.json"
+    fi
+
+    # Copy watched_folders template if missing (no templating needed for now)
     copy_if_needed "$DEFAULTS_DIR/watched_folders.json" "$CONF_DIR/watched_folders.json"
-    
-    # Set ownership
-    chown -R 1000:1000 /config
+
+    # Ensure data directories exist (backed by PVC)
+    mkdir -p /data/downloads
+    mkdir -p /data/torrents
+    mkdir -p /data/movies
+    mkdir -p /data/music
+    mkdir -p /data/tv
+    mkdir -p /data/games
+    mkdir -p /data/books
+
     echo "=== Config initialization complete ==="
-
-

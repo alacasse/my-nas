@@ -17,6 +17,14 @@ if ! multipass info "$VM_NAME" &>/dev/null; then
     exit 1
 fi
 
+# Ensure project is mounted
+echo "Configuring mount..."
+multipass mount . "$VM_NAME:/home/ubuntu/my-nas" || true
+
+# Ensure volumes are mounted
+echo "Configuring volumes..."
+multipass mount "./nas-volumes" "$VM_NAME:/home/ubuntu/nas-volumes" || true
+
 # 1. Install K3S in Multipass VM
 echo ""
 echo "Step 1: Installing K3S in VM..."

@@ -16,8 +16,9 @@ This document outlines the requirements for setting up the NAS environment on a 
 
 ## Storage
 - **Structure**:
-  - A central storage directory (e.g., `/mnt/nas-data`) should be created.
-  - Subdirectories for `nas`, `postgres_data`, `portainer_data`, etc., will be mapped here.
+  - A central storage directory **`/mnt/storage`** should exist on the host.
+  - On the NAS, this is backed by the existing ZFS pool **`nas`**, with the pool (or a primary dataset) mounted at `/mnt/storage`.
+  - Subdirectories for `media`, `apps`, `postgres_data`, `portainer_data`, etc., will be mapped under `/mnt/storage`.
 - **Permissions**:
   - The user running the containers (typically UID 1000) must have read/write access to these directories.
 

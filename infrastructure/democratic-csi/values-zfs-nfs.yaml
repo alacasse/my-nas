@@ -1,0 +1,45 @@
+# values-zfs-nfs.yaml
+#
+# Example values file for the democratic-csi Helm chart, using a local
+# ZFS-backed driver on the NAS pool "nas". This is a starting point and
+# should be reviewed against upstream democratic-csi documentation before
+# use in production.
+#
+# Assumptions:
+#   - Single-node k3s cluster running directly on the NAS.
+#   - ZFS pool is named "nas".
+#   - Pool (or root dataset) is mounted at /mnt/storage.
+#   - You want a StorageClass named "zfs-nfs" for dynamic PVCs.
+
+driver:
+  # CSI driver name (must be unique within the cluster)
+  name: "org.democratic-csi.zfs"
+  type: "zfs-localpv"
+
+# Disable controller, only run node DaemonSet on the NAS node.
+controller:
+  enabled: false
+
+node:
+  driver:
+    type: "zfs-localpv"
+    zfs:
+      # Parent dataset under which per-PVC datasets will be created.
+      # This dataset will be created automatically if it does not exist.
+      datasetParentName: "nas/k3s-pv"
+      # Optional: dataset for detached snapshots
+      detachedSnapshotsDatasetParentName: "nas/k3s-pv-snap"
+      # Example dataset properties (tune as desired)
+      datasetProperties:
+        compression: "lz4"
+        atime: "off"
+
+storageClasses:
+  - name: zfs-nfs
+    defaultClass: false
+    reclaimPolicy: Delete
+    volumeBindingMode: WaitForFirstConsumer
+    allowVolumeExpansion: true
+    parameters:
+      fsType: "ext4"
+

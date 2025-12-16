@@ -14,32 +14,6 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: qbittorrent-data
-  namespace: torrents
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  # storageClassName will be patched by environment overlay
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: qbittorrent-cache
-  namespace: torrents
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  # storageClassName will be patched by environment overlay
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
   name: nas-downloads
   namespace: torrents
 spec:
@@ -48,17 +22,4 @@ spec:
   resources:
     requests:
       storage: 100Gi
-  # storageClassName will be patched by environment overlay
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: nas-torrents
-  namespace: torrents
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi # Watch folder doesn't need much, but good to have separate
   # storageClassName will be patched by environment overlay

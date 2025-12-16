@@ -7,11 +7,21 @@ kind: Kustomization
 resources:
   - ../../apps/base
   - ../../apps/qbittorrent/secrets.enc.yaml
+  # Static PVs for shared NAS media paths
+  - pv.yaml
 
 patches:
-  # Use ZFS storage class for prod
+  # Use ZFS storage class for prod on app-specific PVCs
   - target:
       kind: PersistentVolumeClaim
+      name: qbittorrent-config
+    patch: |-
+      - op: replace
+        path: /spec/storageClassName
+        value: zfs-nfs
+  - target:
+      kind: PersistentVolumeClaim
+      name: portainer-data
     patch: |-
       - op: replace
         path: /spec/storageClassName

@@ -11,7 +11,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/home/ubuntu/nas-volumes/qbittorrent"
+    path: "/home/ubuntu/nas-volumes/apps/qbittorrent/config"
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -26,19 +26,4 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/home/ubuntu/nas-volumes/nas/downloads"
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nas-torrents-pv
-  labels:
-    type: local
-spec:
-  storageClassName: dev-hostpath
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/home/ubuntu/nas-volumes/nas/torrents"
+    path: "/home/ubuntu/nas-volumes/media"

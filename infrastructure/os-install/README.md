@@ -7,6 +7,7 @@ This directory contains the files needed to produce a reproducible Ubuntu Server
 - `autoinstall.yaml` – cloud-init/autoinstall definition (disk layout, user, packages). Replace the placeholder password hash before real use.
 - `build-autoinstall-iso.sh` – helper script that injects the autoinstall files into an official Ubuntu ISO and emits a new ISO under `artifacts/`.
 - `run-autoinstall-vm.sh` – spins up a disposable QEMU/KVM VM (or QEMU-in-Docker when KVM is unavailable) using the generated ISO so you can validate the installer end-to-end.
+- `post-install-storage.sh` – post-install helper to import the `nas` ZFS pool, mount it at `/mnt/storage`, and create the base `media/` and `apps/` directories.
 
 ## Workflow
 
@@ -19,6 +20,19 @@ This directory contains the files needed to produce a reproducible Ubuntu Server
    - By default the script uses host `qemu-system-x86_64` with KVM acceleration when available.
    - Pass `--docker` to run QEMU inside a Docker container if you cannot install QEMU on the host; Docker must run in privileged mode (the script handles the flag).
 5. Once validated, mount the ISO via Supermicro IPMI virtual media and boot the NAS to perform the real install. No manual input should be required beyond confirming boot order.
+
+After OS installation completes on the NAS, SSH in and run:
+
+```bash
+cd /path/to/my-nas
+sudo ./infrastructure/os-install/post-install-storage.sh
+```
+
+This will:
+- Ensure ZFS tools are installed.
+- Import the existing `nas` pool.
+- Mount it at `/mnt/storage`.
+- Create `/mnt/storage/media` and `/mnt/storage/apps`, and set ownership on `apps/` for the main app user (UID 1000 by default).
 
 ## Why Autoinstall + Ansible?
 

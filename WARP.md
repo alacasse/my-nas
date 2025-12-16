@@ -238,7 +238,7 @@ The project is **in transition**. Docker setup is functional; Kubernetes infrast
 ### Environment Variables
 
 Current Docker setup requires:
-- `STORAGE_BASE`: Base path for ZFS-mounted storage (e.g., `/mnt/pool0`)
+- `STORAGE_BASE`: Base path for ZFS-mounted storage (e.g., `/mnt/storage`, backed by ZFS pool `nas` on the NAS)
 - Defined in `docker/.env.dev` or `docker/.env.prod`
 
 ### Security Notes

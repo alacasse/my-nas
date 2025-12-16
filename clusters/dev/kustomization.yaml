@@ -16,7 +16,10 @@ patches:
     patch: |-
       - op: replace
         path: /spec/storageClassName
-        value: local-path
+        value: dev-hostpath
+      - op: add
+        path: /spec/volumeName
+        value: qbittorrent-config-pv
   - target:
       kind: PersistentVolumeClaim
       name: nas-downloads
@@ -27,13 +30,3 @@ patches:
       - op: add
         path: /spec/volumeName
         value: nas-downloads-pv
-  - target:
-      kind: PersistentVolumeClaim
-      name: nas-torrents
-    patch: |-
-      - op: replace
-        path: /spec/storageClassName
-        value: dev-hostpath
-      - op: add
-        path: /spec/volumeName
-        value: nas-torrents-pv

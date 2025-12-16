@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug-nas-permissions-2
+  namespace: torrents
+spec:
+  restartPolicy: Never
+  containers:
+  - name: debugger
+    image: busybox:1.36
+    command: ["/bin/sh", "-c"]
+    args:
+      - |
+        echo "Who am I?"
+        id
+        echo "Listing config and data permissions..."
+        echo "--- /config ---"
+        ls -la /config || true
+        echo "--- /data ---"
+        ls -la /data || true
+        echo "Attempting chown..."
+        touch /config/test_file
+        chown 1000:1000 /config/test_file
+        ls -la /config/test_file
+    volumeMounts:
+    - name: qbittorrent-config
+      mountPath: /config
+    - name: nas-downloads
+      mountPath: /data
+  volumes:
+  - name: qbittorrent-config
+    persistentVolumeClaim:
+      claimName: qbittorrent-config
+  - name: nas-downloads
+    persistentVolumeClaim:
+      claimName: nas-downloads
