@@ -76,6 +76,8 @@ spec:
           mountPath: /config
         - name: defaults
           mountPath: /defaults
+        - name: nas-downloads
+          mountPath: /data
       volumes:
       - name: defaults
         configMap:

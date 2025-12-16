@@ -29,7 +29,9 @@ down: ## Delete resources defined in manifests
 	@echo "Stopping services..."
 	@-$(KUBECTL) delete -k clusters/dev/ --wait=true
 
-restart: down up ## Restart services (Stop + Start)
+restart: ## Restart a specific service (Usage: make restart app=qbittorrent)
+	@./scripts/restart-dev.sh $(app)
+
 
 status: ## Show cluster status
 	@echo "Cluster Status:"
