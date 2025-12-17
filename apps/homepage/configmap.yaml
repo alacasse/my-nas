@@ -27,25 +27,25 @@ data:
   services.yaml: |
     - Management:
         - Portainer:
-            href: http://portainer.nas.test
+            href: http://portainer.{{HOMEPAGE_VAR_DOMAIN_NAME}}
             description: Container Management
             icon: portainer
         - Filebrowser:
-            href: http://files.nas.test
+            href: http://files.{{HOMEPAGE_VAR_DOMAIN_NAME}}
             description: File Management
             icon: filebrowser
     - Media:
         - qBittorrent:
-            href: http://torrent.nas.test
+            href: http://torrent.{{HOMEPAGE_VAR_DOMAIN_NAME}}
             description: Torrent Client
             icon: qbittorrent
     - Monitoring:
         - Grafana:
-            href: http://grafana.nas.test
+            href: http://grafana.{{HOMEPAGE_VAR_DOMAIN_NAME}}
             description: Metrics Dashboard
             icon: grafana
         - Prometheus:
-            href: http://prometheus.nas.test
+            href: http://prometheus.{{HOMEPAGE_VAR_DOMAIN_NAME}}
             description: Metrics Database
             icon: prometheus
 

@@ -26,3 +26,74 @@ patches:
       - op: replace
         path: /spec/storageClassName
         value: zfs-nfs
+  - target:
+      kind: Deployment
+      name: homepage
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env
+        value:
+          - name: HOMEPAGE_VAR_DOMAIN_NAME
+            value: nas.lan
+          - name: HOMEPAGE_ALLOWED_HOSTS
+            value: nas.lan
+
+configMapGenerator:
+  - name: cluster-vars
+    literals:
+      - DOMAIN_NAME=nas.lan
+      - QBITTORRENT_HOST=torrent.nas.lan
+      - PORTAINER_HOST=portainer.nas.lan
+      - HOMEPAGE_HOST=nas.lan
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.HOMEPAGE_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: homepage
+        fieldPaths:
+          - spec.rules.0.host
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.QBITTORRENT_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: qbittorrent
+        fieldPaths:
+          - spec.rules.0.host
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.PORTAINER_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: portainer
+        fieldPaths:
+          - spec.rules.0.host
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.DOMAIN_NAME
+    targets:
+      - select:
+          kind: Deployment
+          name: homepage
+        fieldPaths:
+          - spec.template.spec.containers.0.env.[name=HOMEPAGE_VAR_DOMAIN_NAME].value
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.HOMEPAGE_HOST
+    targets:
+      - select:
+          kind: Deployment
+          name: homepage
+        fieldPaths:
+          - spec.template.spec.containers.0.env.[name=HOMEPAGE_ALLOWED_HOSTS].value

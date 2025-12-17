@@ -31,3 +31,75 @@ patches:
       - op: add
         path: /spec/volumeName
         value: nas-downloads-pv
+  - target:
+      kind: Deployment
+      name: homepage
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env
+        value:
+          - name: HOMEPAGE_VAR_DOMAIN_NAME
+            value: nas.test
+          - name: HOMEPAGE_ALLOWED_HOSTS
+            value: nas.test
+
+configMapGenerator:
+  - name: cluster-vars
+    literals:
+      - DOMAIN_NAME=nas.test
+      - QBITTORRENT_HOST=torrent.nas.test
+      - PORTAINER_HOST=portainer.nas.test
+      - HOMEPAGE_HOST=nas.test
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.HOMEPAGE_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: homepage
+        fieldPaths:
+          - spec.rules.0.host
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.QBITTORRENT_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: qbittorrent
+        fieldPaths:
+          - spec.rules.0.host
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.PORTAINER_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: portainer
+        fieldPaths:
+          - spec.rules.0.host
+  # Also sync env vars from the configmap to ensure consistency
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.DOMAIN_NAME
+    targets:
+      - select:
+          kind: Deployment
+          name: homepage
+        fieldPaths:
+          - spec.template.spec.containers.0.env.[name=HOMEPAGE_VAR_DOMAIN_NAME].value
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.HOMEPAGE_HOST
+    targets:
+      - select:
+          kind: Deployment
+          name: homepage
+        fieldPaths:
+          - spec.template.spec.containers.0.env.[name=HOMEPAGE_ALLOWED_HOSTS].value

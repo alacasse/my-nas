@@ -42,3 +42,6 @@ shell: ## Open SSH shell in the Multipass VM
 
 logs: ## Tail logs. Usage: make logs app=<app-label> (default: qbittorrent)
 	@$(KUBECTL) logs -l app=$(or $(app),qbittorrent) --all-containers=true -f --tail=50
+
+apply: ## Apply a specific app's manifests (Usage: make apply app=qbittorrent)
+	@$(KUBECTL) apply -k clusters/dev/

@@ -13,6 +13,17 @@ spec:
       labels:
         app: homepage
     spec:
+      serviceAccountName: homepage
+      initContainers:
+      - name: init-config
+        image: busybox:latest
+        command: ['sh', '-c', 'cp /config-src/* /app/config/']
+        volumeMounts:
+        - name: homepage-config
+          mountPath: /config-src
+        - name: config
+          mountPath: /app/config
+
       containers:
       - name: homepage
         image: ghcr.io/gethomepage/homepage:latest
@@ -30,5 +41,7 @@ spec:
             cpu: "200m"
       volumes:
       - name: config
+        emptyDir: {}
+      - name: homepage-config
         configMap:
           name: homepage-config
