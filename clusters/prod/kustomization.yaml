@@ -27,6 +27,23 @@ patches:
         path: /spec/storageClassName
         value: zfs-nfs
   - target:
+      kind: PersistentVolumeClaim
+      name: filebrowser-config
+    patch: |-
+      - op: replace
+        path: /spec/storageClassName
+        value: zfs-nfs
+  - target:
+      kind: PersistentVolumeClaim
+      name: nas-media
+    patch: |-
+      - op: replace
+        path: /spec/storageClassName
+        value: ""
+      - op: add
+        path: /spec/volumeName
+        value: nas-media-pv
+  - target:
       kind: Deployment
       name: homepage
     patch: |-
@@ -45,6 +62,7 @@ configMapGenerator:
       - QBITTORRENT_HOST=torrent.nas.lan
       - PORTAINER_HOST=portainer.nas.lan
       - HOMEPAGE_HOST=nas.lan
+      - FILEBROWSER_HOST=files.nas.lan
 
 replacements:
   - source:
@@ -75,6 +93,16 @@ replacements:
       - select:
           kind: Ingress
           name: portainer
+        fieldPaths:
+          - spec.rules.0.host
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.FILEBROWSER_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: filebrowser
         fieldPaths:
           - spec.rules.0.host
   - source:

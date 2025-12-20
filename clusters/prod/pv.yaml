@@ -12,3 +12,18 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/mnt/storage/media"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nas-media-pv
+  labels:
+    type: local
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/storage/media"

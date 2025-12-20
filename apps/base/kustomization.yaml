@@ -9,3 +9,4 @@ resources:
   - ../homepage
   - ../portainer
   - ../qbittorrent
+  - ../filebrowser

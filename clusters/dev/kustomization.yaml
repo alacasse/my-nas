@@ -32,6 +32,26 @@ patches:
         path: /spec/volumeName
         value: nas-downloads-pv
   - target:
+      kind: PersistentVolumeClaim
+      name: filebrowser-config
+    patch: |-
+      - op: replace
+        path: /spec/storageClassName
+        value: dev-hostpath
+      - op: add
+        path: /spec/volumeName
+        value: filebrowser-config-pv
+  - target:
+      kind: PersistentVolumeClaim
+      name: nas-media
+    patch: |-
+      - op: replace
+        path: /spec/storageClassName
+        value: dev-hostpath
+      - op: add
+        path: /spec/volumeName
+        value: nas-media-pv
+  - target:
       kind: Deployment
       name: homepage
     patch: |-
@@ -50,6 +70,7 @@ configMapGenerator:
       - QBITTORRENT_HOST=torrent.nas.test
       - PORTAINER_HOST=portainer.nas.test
       - HOMEPAGE_HOST=nas.test
+      - FILEBROWSER_HOST=files.nas.test
 
 replacements:
   - source:
@@ -80,6 +101,16 @@ replacements:
       - select:
           kind: Ingress
           name: portainer
+        fieldPaths:
+          - spec.rules.0.host
+  - source:
+      kind: ConfigMap
+      name: cluster-vars
+      fieldPath: data.FILEBROWSER_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: filebrowser
         fieldPaths:
           - spec.rules.0.host
   # Also sync env vars from the configmap to ensure consistency

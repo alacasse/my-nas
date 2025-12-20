@@ -27,3 +27,33 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/home/ubuntu/nas-volumes/media"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: filebrowser-config-pv
+  labels:
+    type: local
+spec:
+  storageClassName: dev-hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/home/ubuntu/nas-volumes/apps/filebrowser/config"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nas-media-pv
+  labels:
+    type: local
+spec:
+  storageClassName: dev-hostpath
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/home/ubuntu/nas-volumes/media"
