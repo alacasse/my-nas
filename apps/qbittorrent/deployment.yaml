@@ -70,18 +70,27 @@ spec:
       initContainers:
       - name: init-config
         image: busybox:1.36
-        command: ["/bin/sh", "/defaults/init.sh"]
+        command: ["/bin/sh", "/scripts/init.sh"]
+        env:
+        - name: QBIT_MEDIA_ROOT
+          value: "/data"
         volumeMounts:
         - name: qbittorrent-config
           mountPath: /config
         - name: defaults
           mountPath: /defaults
+        - name: scripts
+          mountPath: /scripts
         - name: nas-downloads
           mountPath: /data
       volumes:
       - name: defaults
         configMap:
           name: qbittorrent-defaults
+          defaultMode: 0755
+      - name: scripts
+        configMap:
+          name: qbittorrent-scripts
           defaultMode: 0755
       - name: qbittorrent-config
         persistentVolumeClaim:
