@@ -2,8 +2,9 @@
 
 VM_NAME := nas-test
 KUBECTL := kubectl
+SOPS := sops
 
-.PHONY: help up down restart status logs shell
+.PHONY: help up down restart status logs shell apply
 
 help: ## Show this help message
 	@echo "Usage: make [target]"
@@ -15,13 +16,19 @@ help: ## Show this help message
 	@echo "  status   - Show status of all pods"
 	@echo "  shell    - Open a shell inside the VM"
 	@echo "  logs     - Tail logs for a specific app (usage: make logs app=qbittorrent)"
+	@echo "  apply    - Apply a specific app's manifests (Usage: make apply app=qbittorrent)"
 	@echo ""
+
+	@echo "Examples:"
+	@echo "  make logs app=qbittorrent    # Tail logs for qbittorrent"
+	@echo "  make apply app=filebrowser   # Apply only filebrowser manifests"
 
 up: ## Apply manifests to the dev cluster
 	@echo "Creating namespaces..."
 	@$(KUBECTL) apply -f apps/base/namespaces.yaml
 	@echo "Applying secrets..."
-	@sops -d apps/qbittorrent/secrets.enc.yaml | $(KUBECTL) apply -f -
+	@$(SOPS) -d apps/networking/qbittorrent/secrets.enc.yaml | $(KUBECTL) apply -f -
+	@$(SOPS) -d apps/nas/filebrowser/secrets.enc.yaml | $(KUBECTL) apply -f -
 	@echo "Applying manifests from clusters/dev/..."
 	@$(KUBECTL) apply -k clusters/dev/
 
@@ -41,7 +48,7 @@ shell: ## Open SSH shell in the Multipass VM
 	@multipass shell $(VM_NAME)
 
 logs: ## Tail logs. Usage: make logs app=<app-label> (default: qbittorrent)
-	@$(KUBECTL) logs -l app=$(or $(app),qbittorrent) --all-containers=true -f --tail=50
+	@$(KUBECTL) logs -l app=$(app) --all-containers=true -f --tail=50
 
 apply: ## Apply a specific app's manifests (Usage: make apply app=qbittorrent)
-	@$(KUBECTL) apply -k clusters/dev/
+	@$(KUBECTL) apply -k clusters/dev/$(app)/

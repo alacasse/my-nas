@@ -9,7 +9,8 @@ resources:
   - ingress.yaml
   - configmap.yaml
   - pvc.yaml
-  - secrets.enc.yaml
+  # Secrets are applied separately via SOPS decryption in the Makefile
+  # to avoid the "sops" field being rejected by Kubernetes
 
 configMapGenerator:
   - name: qbittorrent-scripts
