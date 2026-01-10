@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: nas-limits
+  namespace: nas
+spec:
+  limits:
+  - type: Container
+    default:
+      memory: "256Mi"
+      cpu: "200m"
+    defaultRequest:
+      memory: "64Mi"
+      cpu: "10m"
+    min:
+      memory: "16Mi"
+      cpu: "5m"
+    max:
+      memory: "1Gi"
+      cpu: "1000m"
+  - type: Pod
+    min:
+      memory: "16Mi"
+      cpu: "5m"
+    max:
+      memory: "2Gi"
+      cpu: "2000m"
