@@ -182,7 +182,7 @@ In your CI/CD pipeline, provide the AGE private key via environment variable:
   run: |
     echo "$SOPS_AGE_KEY" > age.key
     export SOPS_AGE_KEY_FILE=age.key
-    kubectl apply -k apps/filebrowser/
+    kubectl apply -k apps/nas/filebrowser/
 ```
 
 ## Troubleshooting
@@ -218,5 +218,5 @@ Check that `encrypted_regex` matches your secret structure. This project uses `^
 ## Reference Files
 
 - [`.sops.yaml`](../.sops.yaml) - SOPS configuration
-- [`apps/filebrowser/secrets.enc.yaml`](../apps/filebrowser/secrets.enc.yaml) - Example encrypted secret
-- [`apps/qbittorrent/secrets.enc.yaml`](../apps/qbittorrent/secrets.enc.yaml) - Another example
+- [`apps/nas/filebrowser/secrets.enc.yaml`](../apps/nas/filebrowser/secrets.enc.yaml) - Example encrypted secret
+- [`apps/networking/qbittorrent/secrets.enc.yaml`](../apps/networking/qbittorrent/secrets.enc.yaml) - Another example

@@ -6,7 +6,8 @@ kind: Kustomization
 
 resources:
   - ../../apps/base
-  - ../../apps/qbittorrent/secrets.enc.yaml
+  - ../../apps/nas
+  - ../../apps/networking
   # Static PVs for shared NAS media paths
   - pv.yaml
 

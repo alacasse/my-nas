@@ -6,6 +6,8 @@ kind: Kustomization
 
 resources:
   - ../../apps/base
+  - ../../apps/nas
+  - ../../apps/networking
   - pv.yaml
   - traefik-config.yaml
 

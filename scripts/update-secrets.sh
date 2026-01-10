@@ -5,9 +5,9 @@ set -e
 PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$(pwd)")
 SOPS_CONFIG="${PROJECT_ROOT}/.sops.yaml"
 AGE_KEY_FILE="${HOME}/.config/sops/age/keys.txt"
-VPN_CONFIG_DIR="${PROJECT_ROOT}/apps/qbittorrent/vpn-config"
-TARGET_SECRET="${PROJECT_ROOT}/apps/qbittorrent/secret.yaml"
-ENCRYPTED_SECRET="${PROJECT_ROOT}/apps/qbittorrent/secrets.enc.yaml"
+VPN_CONFIG_DIR="${PROJECT_ROOT}/apps/networking/qbittorrent/vpn-config"
+TARGET_SECRET="${PROJECT_ROOT}/apps/networking/qbittorrent/secret.yaml"
+ENCRYPTED_SECRET="${PROJECT_ROOT}/apps/networking/qbittorrent/secrets.enc.yaml"
 
 # 1. Check Prerequisites
 if ! command -v sops &> /dev/null; then

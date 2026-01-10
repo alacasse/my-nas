@@ -9,6 +9,7 @@ resources:
   - ingress.yaml
   - configmap.yaml
   - pvc.yaml
+  - secrets.enc.yaml
 
 configMapGenerator:
   - name: qbittorrent-scripts

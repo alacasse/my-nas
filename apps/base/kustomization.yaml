@@ -6,7 +6,3 @@ kind: Kustomization
 
 resources:
   - namespaces.yaml
-  - ../homepage
-  - ../portainer
-  - ../qbittorrent
-  - ../filebrowser
