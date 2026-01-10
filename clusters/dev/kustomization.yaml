@@ -54,6 +54,16 @@ patches:
         path: /spec/volumeName
         value: nas-media-pv
   - target:
+      kind: PersistentVolumeClaim
+      name: filebrowser-media
+    patch: |-
+      - op: replace
+        path: /spec/storageClassName
+        value: dev-hostpath
+      - op: add
+        path: /spec/volumeName
+        value: nas-media-pv
+  - target:
       kind: Deployment
       name: homepage
     patch: |-
