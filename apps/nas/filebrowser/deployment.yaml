@@ -33,7 +33,7 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
-        - name: nas-media
+        - name: filebrowser-media
           mountPath: /srv
       - name: init-filebrowser
         image: filebrowser/filebrowser:latest
@@ -81,7 +81,7 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
-        - name: nas-media
+        - name: filebrowser-media
           mountPath: /srv
       securityContext:
         runAsUser: 1000
@@ -113,7 +113,7 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
-        - name: nas-media
+        - name: filebrowser-media
           mountPath: /srv
         resources:
           requests:
@@ -126,6 +126,6 @@ spec:
       - name: config
         persistentVolumeClaim:
           claimName: filebrowser-config
-      - name: nas-media
+      - name: filebrowser-media
         persistentVolumeClaim:
-          claimName: nas-media
+          claimName: filebrowser-media
