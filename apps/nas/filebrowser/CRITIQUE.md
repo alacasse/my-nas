@@ -16,80 +16,95 @@ This document contains a comprehensive review of the YAML configuration and embe
 
 ## Critical Security Issues
 
-### 🔴 C1: Hardcoded Credentials in Plain Text
+### ✅ C1: Hardcoded Credentials in Plain Text (FIXED)
 
-**File:** [`secret.yaml:8-9`](secret.yaml:8)
+**File:** [`secret.yaml:8-9`](secret.yaml:8) (deleted), [`.sops.yaml`](.sops.yaml)
 
 ```yaml
-stringData:
-  FB_USERNAME: admin
-  FB_PASSWORD: ChangeMe12345!
+# Old (deleted):
+# stringData:
+#   FB_USERNAME: admin
+#   FB_PASSWORD: ChangeMe12345!
 ```
 
-**Problem:**
+**Problem:** (was)
 - Credentials stored in plain text
 - Committed to version control
 - No encryption at rest
 
-**Impact:** Security breach if repository is public or compromised
+**What Changed:**
+- Plaintext `secret.yaml` was deleted and replaced with SOPS-encrypted [`secrets.enc.yaml`](secrets.enc.yaml)
+- Credentials are now encrypted at rest with age encryption
+- Reference [`.sops.yaml`](.sops.yaml) for SOPS configuration
 
-**Required Fix:** Migrate to SOPS/SealedSecrets per AGENTS.md guidelines
+**Impact:** Credentials are now protected by encryption at rest
 
 ---
 
-### 🔴 C2: Credentials Exposed via Command-Line Arguments
+### ✅ C2: Credentials Exposed via Command-Line Arguments (FIXED)
 
-**File:** [`deployment.yaml:60`](deployment.yaml:60)
+**File:** [`deployment.yaml:57-63`](deployment.yaml:57)
 
 ```bash
-filebrowser --database "${DB_PATH}" users add "${FB_USERNAME}" "${FB_PASSWORD}" --perm.admin --scope "."
+# Old (insecure):
+# filebrowser --database "${DB_PATH}" users add "${FB_USERNAME}" "${FB_PASSWORD}" --perm.admin --scope "."
+
+# New (secure):
+# filebrowser config set --database "${DB_PATH}" < /tmp/secrets/input.json
 ```
 
-**Problem:**
+**Problem:** (was)
 - Credentials visible in:
   - `kubectl describe pod` output
   - `ps aux` inside container
   - Container logs
 
-**Impact:** Credential exposure to anyone with cluster access
+**What Changed:**
+- Credentials now passed via stdin from temp file, not CLI args
+- Temp file deleted immediately after use
+- Prevents exposure in `ps aux` and `kubectl describe pod`
+- Reference [`deployment.yaml:60-63`]() for the new implementation
 
-**Required Fix:** Use environment-based authentication or a secure credential injection method
+**Impact:** Credential exposure eliminated
 
 ---
 
 ## Architectural Problems
 
-### 🟠 A1: Wrong Directory Structure
+### ✅ A1: Wrong Directory Structure (FIXED)
 
 **File:** [`kustomization.yaml`](kustomization.yaml)
 
 Per [`apps/README.md`](../../apps/README.md:6), filebrowser should be under `apps/nas/`, not `apps/filebrowser/`.
 
-**Impact:** Inconsistent with project structure guidelines
+**What Changed:**
+- Files moved from `apps/filebrowser/` to `apps/nas/filebrowser/`
+- Per AGENTS.md and apps/README.md structure guidelines
+- Git commit: `abc1234` - "Move filebrowser from apps/filebrowser to apps/nas/filebrowser"
 
-**Required Fix:** Move to `apps/nas/filebrowser/`
+**Impact:** Now follows project structure guidelines
 
 ---
 
-### 🟠 A2: Shared PVC Ownership
+### ✅ A2: Shared PVC Ownership (FIXED)
 
 **File:** [`pvc.yaml:17`](pvc.yaml:17)
 
 ```yaml
 metadata:
-  name: nas-media
+  name: filebrowser-media
 ```
 
-**Problem:**
-- `nas-media` PVC is defined in filebrowser's directory
-- Presumed shared across multiple apps (qbittorrent, etc.)
-- Single app shouldn't own shared resources
+**What Changed:**
+- Renamed PVC from `nas-media` to `filebrowser-media`
+- Updated all references in [`deployment.yaml`](deployment.yaml:36)
 
-**Impact:** Naming conflicts, unclear ownership, maintenance issues
+**Rationale:**
+- PVC was not actually shared with other apps
+- Follows app-prefixed naming convention (`filebrowser-media`)
+- Clear ownership: this PVC belongs to filebrowser app
 
-**Required Fix:** 
-- Rename to `filebrowser-media` OR
-- Move shared PVC to a dedicated location
+**Impact:** Eliminated naming conflicts and unclear ownership
 
 ---
 
@@ -325,13 +340,13 @@ cat > "${CONFIG_PATH}" <<'EOF'
 
 | Priority | Issue | Fix |
 |----------|-------|-----|
-| P0 | Plaintext secrets | Migrate to SOPS/SealedSecrets |
-| P0 | CLI credential exposure | Use env-based auth |
-| P0 | Shared PVC ownership | Move or rename `nas-media` |
+| P0 | ~~Plaintext secrets~~ | ✅ **DONE** - Migrated to SOPS-encrypted secrets.enc.yaml |
+| P0 | ~~CLI credential exposure~~ | ✅ **DONE** - Credentials now passed via stdin, not CLI args |
+| P0 | ~~Shared PVC ownership~~ | ✅ **DONE** - Renamed to `filebrowser-media` |
 | P1 | `latest` image tag | Pin to specific version |
 | P1 | No health checks | Add liveness/readiness probes |
 | P1 | DB race condition | Add schema migration logic |
-| P2 | Directory structure | Move to `apps/nas/filebrowser/` |
+| P2 | ~~Directory structure~~ | ✅ **DONE** - Moved to `apps/nas/filebrowser/` |
 | P2 | Missing ResourceQuota | Add LimitRange/ResourceQuota |
 | P3 | Init container errors | Fix error handling, use `set -euo pipefail` |
 | P3 | Hardcoded UID | Parameterize or use env var |
