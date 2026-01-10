@@ -4,6 +4,69 @@
 
 This project uses [SOPS](https://github.com/mozilla/sops) with AGE encryption for Kubernetes secrets. Secrets are encrypted at rest in version control and decrypted at deployment time.
 
+## Installation
+
+### Option 1: Bundled Binary (Linux AMD64)
+
+This project includes a pre-built SOPS binary for convenience:
+
+```bash
+# Make executable
+chmod +x sops-v3.8.1.linux.amd64
+
+# Verify version
+./sops-v3.8.1.linux.amd64 --version
+# sops 3.8.1
+```
+
+**Location:** `sops-v3.8.1.linux.amd64` (project root)
+
+### Option 2: Package Manager (Ubuntu/Debian)
+
+```bash
+sudo apt update
+sudo apt install sops
+sops --version
+```
+
+### Option 3: Homebrew (macOS)
+
+```bash
+brew install sops
+sops --version
+```
+
+### Option 4: Go Install
+
+```bash
+go install github.com/mozilla/sops/v3/cmd/sops@latest
+sops --version
+```
+
+### Option 5: Download Binary
+
+```bash
+# Download from GitHub releases
+curl -LO https://github.com/mozilla/sops/releases/download/v3.8.1/sops-v3.8.1.linux.amd64
+chmod +x sops-v3.8.1.linux.amd64
+```
+
+## AGE Key Setup
+
+For local development, you'll need to generate or import an AGE key pair:
+
+```bash
+# Generate a new key pair (outputs to age.txt)
+age-keygen -o age.txt
+
+# Export for SOPS usage
+export SOPS_AGE_KEY_FILE=age.txt
+
+# The public key must be added to .sops.yaml for encryption to work
+```
+
+**Security Note:** Store the private key (age.txt) securely. Never commit it to version control. Consider using 1Password, HashiCorp Vault, or a similar secrets manager.
+
 ## File Naming Convention
 
 Encrypted secret files must be named `secrets.enc.yaml` to match the pattern in `.sops.yaml`:
