@@ -36,7 +36,7 @@ spec:
         - name: filebrowser-media
           mountPath: /srv
       - name: init-filebrowser
-        image: filebrowser/filebrowser:latest
+        image: filebrowser/filebrowser:v2.30.0
         command:
         - sh
         - -c
@@ -89,7 +89,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: filebrowser
-        image: filebrowser/filebrowser:latest
+        image: filebrowser/filebrowser:v2.30.0
         ports:
         - containerPort: 80
           name: http
