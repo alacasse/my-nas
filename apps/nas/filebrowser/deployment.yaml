@@ -16,18 +16,7 @@ spec:
       initContainers:
       - name: init-config-perms
         image: busybox:1.36
-        command:
-        - sh
-        - -c
-        - |
-          set -e
-          mkdir -p /config
-          # Only chown if needed; root-squashed volumes will reject chown even when already owned.
-          if [ "$(stat -c %u /config)" != "1000" ]; then
-            chown -R 1000:1000 /config || echo "WARN: unable to chown /config (root_squash?)"
-          fi
-          # Ensure top-level media dirs are writable by the app user.
-          find /srv -maxdepth 1 -type d ! -user 1000 -exec chown 1000:1000 {} + 2>/tmp/chown.log || echo "WARN: unable to chown /srv (root_squash?)"
+        command: ["/bin/sh", "/scripts/init-config-perms.sh"]
         securityContext:
           runAsUser: 0
         volumeMounts:
@@ -35,35 +24,11 @@ spec:
           mountPath: /config
         - name: filebrowser-media
           mountPath: /srv
+        - name: scripts
+          mountPath: /scripts
       - name: init-filebrowser
         image: filebrowser/filebrowser:v2.30.0
-        command:
-        - sh
-        - -c
-        - |
-          set -eu
-          DB_PATH="/config/filebrowser.db"
-          CONFIG_PATH="/config/settings.json"
-          cat > "${CONFIG_PATH}" <<'EOF'
-          {
-            "port": 80,
-            "baseURL": "",
-            "address": "",
-            "log": "stdout",
-            "database": "/config/filebrowser.db",
-            "root": "/srv"
-          }
-          EOF
-          if [ ! -f "${DB_PATH}" ]; then
-            /filebrowser config init -c "${CONFIG_PATH}" -d "${DB_PATH}" --root /srv --log stdout --address "" --port 80
-            # Seed admin user only on first init to avoid DB lock races during restarts.
-            # Credentials passed via temp file to avoid exposure in ps aux/kubectl describe
-            printf '%s\n%s\n' "${FB_USERNAME}" "${FB_PASSWORD}" > /tmp/fb_creds.txt
-            /filebrowser --database "${DB_PATH}" users add --perm.admin --scope "." < /tmp/fb_creds.txt
-            rm -f /tmp/fb_creds.txt
-          else
-            echo "DB already exists; skipping user init to avoid lock contention."
-          fi
+        command: ["/bin/sh", "/scripts/init-filebrowser.sh"]
         env:
         - name: FB_USERNAME
           valueFrom:
@@ -83,6 +48,8 @@ spec:
           mountPath: /config
         - name: filebrowser-media
           mountPath: /srv
+        - name: scripts
+          mountPath: /scripts
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
@@ -129,3 +96,7 @@ spec:
       - name: filebrowser-media
         persistentVolumeClaim:
           claimName: filebrowser-media
+      - name: scripts
+        configMap:
+          name: filebrowser-scripts
+          defaultMode: 0755

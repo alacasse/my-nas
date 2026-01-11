@@ -9,3 +9,10 @@ resources:
   - pvc-media.yaml
   # Secrets are applied separately via SOPS decryption in the Makefile
   # to avoid the "sops" field being rejected by Kubernetes
+
+# Generate ConfigMap for init scripts
+configMapGenerator:
+  - name: filebrowser-scripts
+    files:
+      - scripts/init-config-perms.sh
+      - scripts/init-filebrowser.sh
