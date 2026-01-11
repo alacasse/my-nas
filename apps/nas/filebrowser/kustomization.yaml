@@ -5,6 +5,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
-  - pvc.yaml
+  - pvc-config.yaml
+  - pvc-media.yaml
   # Secrets are applied separately via SOPS decryption in the Makefile
   # to avoid the "sops" field being rejected by Kubernetes

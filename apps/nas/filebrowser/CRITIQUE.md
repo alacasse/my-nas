@@ -108,7 +108,7 @@ metadata:
 
 ---
 
-### 🟠 A3: No ResourceQuota for `nas` Namespace
+### ✅ A3: No ResourceQuota for `nas` Namespace
 
 **File:** [`apps/base/namespaces.yaml`](../../apps/base/namespaces.yaml)
 
@@ -120,26 +120,26 @@ The `nas` namespace has no ResourceQuota or LimitRange defined.
 
 ---
 
-### 🟠 A4: Image Tag `latest` is Anti-Pattern
+### ✅ A4: Image Tag `latest` is Anti-Pattern (FIXED)
 
 **File:** [`deployment.yaml:39,89`](deployment.yaml:39)
 
 ```yaml
-image: filebrowser/filebrowser:latest
+image: filebrowser/filebrowser:v2.30.0
 ```
 
-**Problem:**
+**Problem:** (was)
 - No reproducible deployments
 - Updates happen silently
 - May cause unexpected behavior on restart
 
-**Required Fix:** Pin to specific version (e.g., `v2.28.0`)
+**Fixed:** Pinned to specific version `v2.30.0`
 
 ---
 
 ## YAML Validity Issues
 
-### 🟡 Y1: Multiple Documents Without Separation
+### ✅ Y1: Multiple Documents Without Separation (FIXED)
 
 **File:** [`pvc.yaml`](pvc.yaml)
 
@@ -155,6 +155,11 @@ kind: PersistentVolumeClaim
 - Hard to edit/maintain
 
 **Recommended Fix:** Split into `filebrowser-config-pvc.yaml` and `nas-media-pvc.yaml`
+
+**What Changed:**
+- The file `pvc.yaml` was split into `pvc-config.yaml` and `pvc-media.yaml`
+- Each PVC is now in its own file
+- Updated `kustomization.yaml` to reference both new files
 
 ---
 
@@ -343,7 +348,7 @@ cat > "${CONFIG_PATH}" <<'EOF'
 | P0 | ~~Plaintext secrets~~ | ✅ **DONE** - Migrated to SOPS-encrypted secrets.enc.yaml |
 | P0 | ~~CLI credential exposure~~ | ✅ **DONE** - Credentials now passed via stdin, not CLI args |
 | P0 | ~~Shared PVC ownership~~ | ✅ **DONE** - Renamed to `filebrowser-media` |
-| P1 | `latest` image tag | Pin to specific version |
+| P1 | ~~`latest` image tag~~ | ✅ **DONE** - Pinned to specific version `v2.30.0` |
 | P1 | No health checks | Add liveness/readiness probes |
 | P1 | DB race condition | Add schema migration logic |
 | P2 | ~~Directory structure~~ | ✅ **DONE** - Moved to `apps/nas/filebrowser/` |
@@ -351,7 +356,7 @@ cat > "${CONFIG_PATH}" <<'EOF'
 | P3 | Init container errors | Fix error handling, use `set -euo pipefail` |
 | P3 | Hardcoded UID | Parameterize or use env var |
 | P4 | Explicit Service type | Add `type: ClusterIP` |
-| P4 | Split multi-doc YAML | Separate PVC files |
+| P4 | ~~Split multi-doc YAML~~ | ✅ **DONE** - Split into separate PVC files |
 
 ---
 

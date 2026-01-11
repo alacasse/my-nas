@@ -41,7 +41,7 @@ spec:
         - sh
         - -c
         - |
-          set -euo pipefail
+          set -eu
           DB_PATH="/config/filebrowser.db"
           CONFIG_PATH="/config/settings.json"
           cat > "${CONFIG_PATH}" <<'EOF'
@@ -55,11 +55,11 @@ spec:
           }
           EOF
           if [ ! -f "${DB_PATH}" ]; then
-            filebrowser config init -c "${CONFIG_PATH}" -d "${DB_PATH}" --root /srv --log stdout --address "" --port 80
+            /filebrowser config init -c "${CONFIG_PATH}" -d "${DB_PATH}" --root /srv --log stdout --address "" --port 80
             # Seed admin user only on first init to avoid DB lock races during restarts.
             # Credentials passed via temp file to avoid exposure in ps aux/kubectl describe
             printf '%s\n%s\n' "${FB_USERNAME}" "${FB_PASSWORD}" > /tmp/fb_creds.txt
-            filebrowser --database "${DB_PATH}" users add --perm.admin --scope "." < /tmp/fb_creds.txt
+            /filebrowser --database "${DB_PATH}" users add --perm.admin --scope "." < /tmp/fb_creds.txt
             rm -f /tmp/fb_creds.txt
           else
             echo "DB already exists; skipping user init to avoid lock contention."
